@@ -48,9 +48,19 @@ Before the first question:
    `contextLoading.atSessionStart` — the KB's `CLAUDE.md` and each repo's `CLAUDE.md`, in the
    order given. Then read `requirement.md`.
 2. For each repo, load the discovery docs and the understand graph.
-3. **Check artefact freshness.** Compare `.ua/meta.json`'s `gitCommitHash` against that repo's
-   current `HEAD`. If they differ, the graph predates the working tree — say so up front and
-   note it in `state.md`. Refining against stale artefacts silently produces wrong answers.
+3. **Check artefact freshness — in two steps.** Compare `.ua/meta.json`'s `gitCommitHash`
+   against that repo's current `HEAD`. **A difference alone does not mean stale.** Check whether
+   any *source* changed:
+
+   ```bash
+   git -C <repo> diff --name-only <graphCommit>..HEAD -- src/
+   ```
+
+   Empty result → the graph still describes the code accurately; record it as fresh and move on.
+   Non-empty → genuinely stale: say so up front, note it in `state.md`, and offer to re-run
+   `/understand` before continuing. Refining against a genuinely stale graph produces
+   confidently wrong answers — but re-running it for a `.gitignore` commit wastes everyone's
+   time, so don't report stale without the second check.
 4. Write `state.md` with phase `loading` → `interviewing`.
 
 If `state.md` already exists, **you are resuming** — jump to [Resuming](#resuming-a-session).

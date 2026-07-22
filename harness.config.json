@@ -71,7 +71,7 @@
           "graph": ".ua/knowledge-graph.json",
           "meta": ".ua/meta.json",
           "graphShape": "version, project, nodes, edges, layers, tour",
-          "freshnessCheck": "compare .ua/meta.json gitCommitHash against the repo's current HEAD; if they differ the graph predates the working tree"
+          "freshnessCheck": "Two steps. (1) Compare .ua/meta.json gitCommitHash against the repo's current HEAD. (2) If they differ, that alone does NOT mean stale — check whether any SOURCE files changed: `git diff --name-only <graphCommit>..HEAD -- src/`. Only a non-empty result makes the graph stale. Commits touching only .gitignore, .claude/, docs/ or .ua/ leave the graph accurate, and re-running /understand for those is wasted effort."
         }
       },
       "doNotEdit": [
@@ -110,7 +110,7 @@
           "graph": ".ua/knowledge-graph.json",
           "meta": ".ua/meta.json",
           "graphShape": "version, project, nodes, edges, layers, tour",
-          "freshnessCheck": "compare .ua/meta.json gitCommitHash against the repo's current HEAD; if they differ the graph predates the working tree"
+          "freshnessCheck": "Two steps. (1) Compare .ua/meta.json gitCommitHash against the repo's current HEAD. (2) If they differ, that alone does NOT mean stale — check whether any SOURCE files changed: `git diff --name-only <graphCommit>..HEAD -- src/`. Only a non-empty result makes the graph stale. Commits touching only .gitignore, .claude/, docs/ or .ua/ leave the graph accurate, and re-running /understand for those is wasted effort."
         }
       },
       "doNotEdit": [
