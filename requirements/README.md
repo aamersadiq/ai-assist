@@ -61,7 +61,6 @@ Read [`../CLAUDE.md`](../CLAUDE.md). The short version:
 
 ## Index
 
-*None yet.* Add a row per requirement as they are written.
-
 | # | Title | Status | Updated |
 |---|---|---|---|
+| [R-001](create-account-upgrade/requirements-v1.md) | Account creation supports transaction and credit account types | refined | 2026-07-22 |
