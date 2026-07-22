@@ -44,7 +44,9 @@ are never edited or deleted.**
 
 Before the first question:
 
-1. Read the config, the knowledge base, and `requirement.md`.
+1. Read the config, then load every entry document listed in
+   `contextLoading.atSessionStart` — the KB's `CLAUDE.md` and each repo's `CLAUDE.md`, in the
+   order given. Then read `requirement.md`.
 2. For each repo, load the discovery docs and the understand graph.
 3. **Check artefact freshness.** Compare `.ua/meta.json`'s `gitCommitHash` against that repo's
    current `HEAD`. If they differ, the graph predates the working tree — say so up front and

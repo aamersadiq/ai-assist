@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "permissions": {
+    "additionalDirectories": [
+      "../bank-harness",
+      "../bank-harness-fe",
+      "../bank-harness-kb"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/load-context.js",
+            "timeout": 15,
+            "statusMessage": "Loading solution context…"
+          }
+        ]
+      }
+    ]
+  }
+}

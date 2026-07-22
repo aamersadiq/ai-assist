@@ -139,6 +139,37 @@
     "portability": "state.md carries everything needed to resume on another machine or tool. No state is held outside the requirement folder."
   },
 
+  "contextLoading": {
+    "_comment": "Read at the start of EVERY session, before any other work. This is the resolved form of the `entry` field on each knowledgeBase and repository — if an entry is added or renamed there, update this list too.",
+    "atSessionStart": [
+      {
+        "source": "self",
+        "file": "CLAUDE.md",
+        "why": "How this harness works and the rules of engagement. Loads automatically as project context."
+      },
+      {
+        "source": "bank-harness-kb",
+        "file": "../bank-harness-kb/CLAUDE.md",
+        "why": "Canonical business knowledge — vocabulary, rules, journeys, constraints. Read before the repos.",
+        "order": 1
+      },
+      {
+        "source": "bank-harness",
+        "file": "../bank-harness/CLAUDE.md",
+        "why": "What the banking service is and how it is organised, plus its own caveats.",
+        "order": 2
+      },
+      {
+        "source": "bank-harness-fe",
+        "file": "../bank-harness-fe/CLAUDE.md",
+        "why": "What the customer application is and how it is organised, plus its own caveats.",
+        "order": 3
+      }
+    ],
+    "rationale": "Each repo's CLAUDE.md is its own maintained orientation. Loading all of them means the harness starts with the whole solution in view rather than discovering it mid-task, and it inherits each repo's stated caveats — including which files must never be hand-edited.",
+    "thenOnDemand": "Deeper documents are pulled per question via the `routing` section below. Do not bulk-load docs/ or .ua/ at session start."
+  },
+
   "commands": [
     {
       "id": "refine",

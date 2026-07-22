@@ -8,13 +8,36 @@ The harness for **refining requirements** for the bank-harness banking solution,
 **running the solution as a whole**. It is the only place that works across repositories —
 everything else in the workspace is deliberately self-contained.
 
-## Read the config first
+## Session start — do this first
+
+**1. Read [`harness.config.json`](harness.config.json).**
+
+**2. Load every entry document it lists under `contextLoading.atSessionStart`, in the order
+given.** As of now that resolves to:
+
+| Order | File | Gives you |
+|---|---|---|
+| 1 | [`../bank-harness-kb/CLAUDE.md`](../bank-harness-kb/CLAUDE.md) | Canonical business knowledge — vocabulary, rules, journeys, constraints |
+| 2 | [`../bank-harness/CLAUDE.md`](../bank-harness/CLAUDE.md) | The banking service, and its own caveats |
+| 3 | [`../bank-harness-fe/CLAUDE.md`](../bank-harness-fe/CLAUDE.md) | The customer application, and its own caveats |
+
+Take the list from the config, not from this table — the config is the source of truth and this
+table is a convenience copy. Each of those files is that repo's own maintained orientation, so
+loading them means you start with the whole solution in view rather than discovering it
+mid-task, and you inherit each repo's stated caveats — including which files must never be
+hand-edited.
+
+**3. Stop there.** Do **not** bulk-load `docs/` or `.ua/`. Those are pulled per question via
+`routing`, described below.
+
+## What the config declares
 
 **[`harness.config.json`](harness.config.json) is the source of truth** for what this harness is
-connected to. Read it before anything else. It declares:
+connected to:
 
 | Section | What it tells you |
 |---|---|
+| `contextLoading` | The entry documents to load at session start, and in what order |
 | `knowledgeBases` | The canonical business knowledge, and the document to open for each kind of question |
 | `repositories` | The implementation repos, what each is responsible for, and **what must not be edited** |
 | `routing` | Which source answers which kind of question — consult in that order |
