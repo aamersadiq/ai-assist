@@ -1,0 +1,246 @@
+{
+  "version": 1,
+  "harness": {
+    "id": "ai-assist",
+    "name": "Bank Harness — Requirements Assistant",
+    "purpose": "Refine requirements for the bank-harness solution, and operate the solution as a whole.",
+    "owns": [
+      "requirement capture and refinement",
+      "anything that spans more than one repository",
+      "running the solution end to end"
+    ],
+    "pathsAreRelativeTo": "this file's directory",
+    "pathNote": "All paths are RELATIVE by design. Absolute paths broke once already when these repos were moved into muli-repo/ — do not reintroduce them."
+  },
+
+  "knowledgeBases": [
+    {
+      "id": "bank-harness-kb",
+      "path": "../bank-harness-kb",
+      "role": "business-knowledge",
+      "authority": "canonical",
+      "access": "read-write",
+      "summary": "The canonical business knowledge for the banking product: vocabulary, domain concepts, rules, journeys, constraints. Written to be read without any codebase.",
+      "entry": "CLAUDE.md",
+      "consultFirst": true,
+      "documents": {
+        "overview": "docs/solution-overview.md",
+        "glossary": "docs/glossary.md",
+        "concepts": "docs/domain-concepts.md",
+        "rules": "docs/business-rules.md",
+        "journeys": "docs/customer-journeys.md",
+        "constraints": "docs/constraints-and-gaps.md",
+        "decisions": "docs/open-questions.md"
+      },
+      "conventions": {
+        "[rule]": "enforced by the product today",
+        "[intent]": "stakeholder-confirmed direction, NOT built — never cite as an active rule",
+        "[gap]": "known limitation with a business consequence",
+        "[open]": "undecided; see decisions document"
+      }
+    }
+  ],
+
+  "repositories": [
+    {
+      "id": "bank-harness",
+      "path": "../bank-harness",
+      "role": "implementation",
+      "layer": "service",
+      "access": "read-only",
+      "summary": "Banking service. Holds every account and transaction, and enforces every rule about money.",
+      "entry": "CLAUDE.md",
+      "docsDir": "docs",
+      "docsAreGenerated": true,
+      "artefacts": {
+        "discovery": {
+          "dir": "docs",
+          "producedBy": "/codebase-discovery",
+          "highlights": [
+            "docs/domain/domain-model.md",
+            "docs/domain/business-rules.md",
+            "docs/business/workflows.md",
+            "docs/tech/current-architecture.md"
+          ],
+          "freshnessFile": "docs/_discovery/discovery-state.md",
+          "openItems": "docs/_discovery/assumptions-register.md"
+        },
+        "understand": {
+          "dir": ".ua",
+          "producedBy": "/understand",
+          "graph": ".ua/knowledge-graph.json",
+          "meta": ".ua/meta.json",
+          "graphShape": "version, project, nodes, edges, layers, tour",
+          "freshnessCheck": "compare .ua/meta.json gitCommitHash against the repo's current HEAD; if they differ the graph predates the working tree"
+        }
+      },
+      "doNotEdit": [
+        "CLAUDE.md",
+        "docs/**",
+        ".ua/**"
+      ],
+      "doNotEditReason": "Generated and maintained by tooling (/codebase-discovery and /understand). Hand edits are clobbered on the next run and diverge from what the tooling believes it wrote."
+    },
+    {
+      "id": "bank-harness-fe",
+      "path": "../bank-harness-fe",
+      "role": "implementation",
+      "layer": "customer-application",
+      "access": "read-only",
+      "summary": "Customer-facing application. Presents accounts and history, collects input, decides nothing about money.",
+      "entry": "CLAUDE.md",
+      "docsDir": "docs",
+      "docsAreGenerated": true,
+      "artefacts": {
+        "discovery": {
+          "dir": "docs",
+          "producedBy": "/codebase-discovery",
+          "highlights": [
+            "docs/domain/domain-model.md",
+            "docs/domain/business-rules.md",
+            "docs/business/workflows.md",
+            "docs/tech/current-architecture.md"
+          ],
+          "freshnessFile": "docs/_discovery/discovery-state.md",
+          "openItems": "docs/_discovery/assumptions-register.md"
+        },
+        "understand": {
+          "dir": ".ua",
+          "producedBy": "/understand",
+          "graph": ".ua/knowledge-graph.json",
+          "meta": ".ua/meta.json",
+          "graphShape": "version, project, nodes, edges, layers, tour",
+          "freshnessCheck": "compare .ua/meta.json gitCommitHash against the repo's current HEAD; if they differ the graph predates the working tree"
+        }
+      },
+      "doNotEdit": [
+        "CLAUDE.md",
+        "docs/**",
+        ".ua/**"
+      ],
+      "doNotEditReason": "Generated and maintained by tooling (/codebase-discovery and /understand). Hand edits are clobbered on the next run and diverge from what the tooling believes it wrote."
+    }
+  ],
+
+  "refinement": {
+    "workspaceRoot": "requirements",
+    "layout": "requirements/<slug>/",
+    "inputFile": "requirement.md",
+    "outputs": {
+      "interview": "interview-v<n>.md",
+      "state": "state.md",
+      "requirements": "requirements-v<n>.md"
+    },
+    "stateFile": "state.md",
+    "versioning": "One version per completed refinement pass. Re-refining increments n; earlier versions are never edited or deleted.",
+    "questionIds": "Q<n>, allocated globally in order across the whole session and never reused, including across versions.",
+    "questionStatuses": ["open", "answered", "parked", "ignored", "blocked", "superseded"],
+    "resumable": true,
+    "portability": "state.md carries everything needed to resume on another machine or tool. No state is held outside the requirement folder."
+  },
+
+  "commands": [
+    {
+      "id": "refine",
+      "invoke": "/refine [requirement folder or slug]",
+      "path": ".claude/commands/refine.md",
+      "runsSkill": "refine-requirement",
+      "purpose": "Entry point for refinement. Resolves the target folder, decides new / resume / re-refine, then hands off to the skill."
+    }
+  ],
+
+  "skills": [
+    {
+      "id": "refine-requirement",
+      "path": ".claude/skills/refine-requirement/SKILL.md",
+      "invokedBy": "/refine",
+      "purpose": "Run a resumable requirement-refinement session: load context, interview, record every question and answer, produce an agreed requirement.",
+      "useWhen": "Refining a requirement.md into requirements-v<n>.md, resuming a paused session, or re-refining an existing one.",
+      "consumes": [
+        "harness.config.json",
+        "knowledgeBases[].documents",
+        "repositories[].artefacts.discovery",
+        "repositories[].artefacts.understand",
+        "requirements/<slug>/requirement.md"
+      ],
+      "uses": ["interview-me"],
+      "produces": [
+        "requirements/<slug>/interview-v<n>.md",
+        "requirements/<slug>/state.md",
+        "requirements/<slug>/requirements-v<n>.md"
+      ],
+      "templates": [
+        "templates/interview.md",
+        "templates/state.md",
+        "templates/requirement.md"
+      ],
+      "local": true
+    },
+    {
+      "id": "interview-me",
+      "path": ".claude/skills/interview-me/SKILL.md",
+      "purpose": "Interview the requester one question at a time to turn a vague ask into a confirmed requirement, checked against the knowledge base.",
+      "useWhen": "A request is underspecified, or before writing anything into requirements/.",
+      "produces": "A confirmed intent statement that maps onto templates/requirement.md",
+      "adaptedFrom": "https://github.com/addyosmani/agent-skills — skills/interview-me",
+      "local": true
+    }
+  ],
+
+  "routing": {
+    "_comment": "Which source answers which kind of question. Consult in this order; stop at the first that answers.",
+    "what a term means": ["bank-harness-kb:glossary"],
+    "what the product does": ["bank-harness-kb:overview"],
+    "what rule applies": ["bank-harness-kb:rules"],
+    "what a user experiences": ["bank-harness-kb:journeys"],
+    "why something is not possible": ["bank-harness-kb:constraints", "bank-harness-kb:decisions"],
+    "whether something is already decided": ["bank-harness-kb:decisions"],
+    "how it is built or structured": ["bank-harness:entry", "bank-harness-fe:entry"],
+    "how the parts talk to each other": ["bank-harness:docsDir"],
+    "how to run it": ["self:runtime"]
+  },
+
+  "runtime": {
+    "_comment": "Verified 2026-07-22. Start in this order — the service exits immediately if its datastore is unreachable at startup.",
+    "startOrder": ["datastore", "service", "application"],
+    "components": [
+      {
+        "id": "datastore",
+        "workingDir": "../bank-harness",
+        "command": "docker-compose up -d",
+        "ports": [27017, 8081],
+        "required": true,
+        "notes": "Also starts an admin UI on 8081. Data persists across restarts."
+      },
+      {
+        "id": "service",
+        "workingDir": "../bank-harness",
+        "command": "npm run dev",
+        "ports": [3000],
+        "required": true,
+        "notes": "Exposes interactive API documentation, usable on its own without the customer application."
+      },
+      {
+        "id": "application",
+        "workingDir": "../bank-harness-fe",
+        "command": "npm run dev",
+        "ports": [5174],
+        "required": false,
+        "notes": "Proxies API calls to the service, so the browser stays same-origin."
+      }
+    ],
+    "knownIssues": [
+      "No seed data exists anywhere. A fresh datastore has no accounts; create one and deposit before withdrawal or transfer will work.",
+      "The customer application defines a lint script whose tool is not installed — it fails."
+    ]
+  },
+
+  "workingAgreements": [
+    "Read the knowledge base before the code. It is the canonical source for business language and rules.",
+    "Never edit anything under doNotEdit. Those docs are tool-generated.",
+    "Requirements are written in business language. If a requirement can only be understood with a file open, it is a task, not a requirement.",
+    "Do not invent rules. If the knowledge base does not state it, it is not a rule — check constraints and decisions before assuming.",
+    "[intent] items are not built. Never write a requirement that assumes one is already in place.",
+    "When refinement establishes a new business fact, update the knowledge base — not the repositories."
+  ]
+}
