@@ -143,6 +143,9 @@ codebase of its own to build against.
 
 ## Running the solution
 
-See `runtime` in the config. Start the datastore first — the service exits immediately if it
-can't reach one at startup. Note there is **no seed data**: a fresh datastore has no accounts,
-and an account must be created and funded before withdrawal or transfer will do anything.
+Follow **[`RUNNING.md`](RUNNING.md)** — the executable walkthrough of the `runtime` section of
+the config, in order (datastore → service → application), each step linking to the owning
+repo's own README, plus a verification step and how to stop everything cleanly. Start the
+datastore first — the service exits immediately if it can't reach one at startup. There is
+**no seed data**: a fresh datastore has no accounts, and an account must be created and funded
+before withdrawal or transfer will do anything.

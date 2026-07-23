@@ -83,6 +83,6 @@ base.
 
 ## Running the solution
 
-See the `runtime` section of the config. Start the datastore first — the service exits
-immediately if it can't reach one. There is no seed data, so create and fund an account before
-expecting withdrawals or transfers to do anything.
+See **[`RUNNING.md`](RUNNING.md)** — start the datastore first (the service exits immediately
+if it can't reach one), then the service, then the customer application, with links to each
+repo's own README for detail and a verification step to confirm it's actually working.
