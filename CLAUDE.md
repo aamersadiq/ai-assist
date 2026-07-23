@@ -130,6 +130,17 @@ applies to itself.
 - Say explicitly if it conflicts with a settled decision or a known gap.
 - If it can only be understood with a file open, it's a task, not a requirement.
 
+## Turning a requirement into a spec (spec-kit)
+
+Once `/refine` produces a `requirements-v<n>.md`, **[`/specify-requirement`](.claude/commands/specify-requirement.md)**
+feeds it into [spec-kit](https://github.com/github/spec-kit) to produce a structured spec —
+User Stories, Acceptance Scenarios, and Functional Requirements, all in Given/When/Then with
+concrete example data (required by [the constitution](.specify/memory/constitution.md)).
+
+See **[`specs/README.md`](specs/README.md)** for the full pipeline, from `requirement.md`
+through to `/speckit-implement` — including where this harness's role ends, since it has no
+codebase of its own to build against.
+
 ## Running the solution
 
 See `runtime` in the config. Start the datastore first — the service exits immediately if it
