@@ -87,8 +87,14 @@ until it's funded. So the smallest real check is: create an account, then deposi
 
 ## Stopping everything
 
-Reverse order — application and service are just terminal processes; the datastore is a
-container that keeps running (and keeps its data) until you stop it explicitly:
+> **"Stop the application" means stop everything** — datastore, service, and customer
+> application together, not just the front end. Use this whole section, not just one step of
+> it, whenever asked to stop "the application" or "the solution".
+
+Reverse order — application and service are just processes; the datastore is a container that
+keeps running (and keeps its data) until you stop it explicitly.
+
+### Normal case: you have the terminals open
 
 ```bash
 # Ctrl+C in the bank-harness-fe terminal (customer application)
@@ -97,3 +103,49 @@ container that keeps running (and keeps its data) until you stop it explicitly:
 cd ../bank-harness
 docker compose down            # stop MongoDB; add -v to also delete its data volume
 ```
+
+### If a process is orphaned (no terminal to Ctrl+C in)
+
+This happens if whatever started `npm run dev` exited without stopping its child — the service
+or application keeps running on its port with nothing left attached to stop it. Confirmed to
+happen when a Claude Code session ends mid-run: the background process survives the session.
+Find and stop it directly instead:
+
+**Windows:**
+```bash
+netstat -ano | grep ":3000" | grep LISTENING     # find the PID in the last column — 5174 for the app
+powershell -Command "Stop-Process -Id <PID> -Force"
+```
+
+**macOS/Linux:**
+```bash
+lsof -ti :3000 | xargs kill      # 5174 for the app
+```
+
+### Verify everything actually stopped
+
+**Always run this after stopping — don't report it as stopped until this test confirms it.**
+Ctrl+C and `docker compose down` can silently fail to kill everything (that's exactly what
+happened here: the front end survived as an orphaned process bound to IPv6 only, and looked
+stopped until this test was actually run). Treat this as a required last step, not an optional
+check.
+
+Don't check IPv4 loopback (`127.0.0.1`) alone — Vite (the customer application's dev server)
+can end up bound to the IPv6 loopback (`::1`) only, which an IPv4-only check will silently miss
+and report as free when it isn't. Use `curl`, which resolves `localhost` the way a browser
+would:
+
+```bash
+for p in 3000 5174 27017 8081; do
+  code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 1 "http://localhost:$p" 2>/dev/null)
+  [ "$code" = "000" ] && echo "port $p: free" || echo "port $p: still in use (HTTP $code)"
+done
+```
+
+A real HTTP status code (even an error page) means something is still listening; "connection
+refused" means it's actually stopped. If you check with `netstat` instead, look specifically
+for a `LISTENING` line — entries in `TIME_WAIT`/`FIN_WAIT_2`/`CLOSE_WAIT` are just leftover
+connections closing down on their own, not a still-running server.
+
+All four stopped = fully down. If you only Ctrl+C'd the service and application and haven't run
+`docker compose down` yet, 27017/8081 still responding is expected, not a leak.

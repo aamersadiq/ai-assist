@@ -13,19 +13,11 @@ everything else in the workspace is deliberately self-contained.
 **1. Read [`harness.config.json`](harness.config.json).**
 
 **2. Load every entry document it lists under `contextLoading.atSessionStart`, in the order
-given.** As of now that resolves to:
-
-| Order | File | Gives you |
-|---|---|---|
-| 1 | [`../bank-harness-kb/CLAUDE.md`](../bank-harness-kb/CLAUDE.md) | Canonical business knowledge — vocabulary, rules, journeys, constraints |
-| 2 | [`../bank-harness/CLAUDE.md`](../bank-harness/CLAUDE.md) | The banking service, and its own caveats |
-| 3 | [`../bank-harness-fe/CLAUDE.md`](../bank-harness-fe/CLAUDE.md) | The customer application, and its own caveats |
-
-Take the list from the config, not from this table — the config is the source of truth and this
-table is a convenience copy. Each of those files is that repo's own maintained orientation, so
-loading them means you start with the whole solution in view rather than discovering it
-mid-task, and you inherit each repo's stated caveats — including which files must never be
-hand-edited.
+given.** Always take the live list from the config, not from memory — it currently resolves to
+the KB's and each repo's `CLAUDE.md`, in order. Each of those files is that repo's own
+maintained orientation, so loading them means you start with the whole solution in view rather
+than discovering it mid-task, and you inherit each repo's stated caveats — including which
+files must never be hand-edited.
 
 **3. Stop there.** Do **not** bulk-load `docs/` or `.ua/`. Those are pulled per question via
 `routing`, described below.
@@ -101,24 +93,9 @@ Three pieces, each with one job:
 | **`refine-requirement`** skill | The session — context loading, records, state, versioning. |
 | **`interview-me`** skill | The questioning method. `refine-requirement` supplies the grounding it assumes. |
 
-### The steps it follows
-
-1. **Restate it in the product's own language.** Check every term against the
-   [glossary](../bank-harness-kb/docs/glossary.md) — including its "words we deliberately don't
-   use" list, which catches the most common misunderstandings (there is no *customer*, nothing
-   is ever *pending*, there are no *failed transactions* to look at).
-2. **Check it's not already answered.** The
-   [decisions](../bank-harness-kb/docs/open-questions.md) record what's settled and why —
-   several requirements are really settled decisions being reopened.
-3. **Check it's possible.** [constraints-and-gaps.md](../bank-harness-kb/docs/constraints-and-gaps.md)
-   lists what the product cannot currently support. A requirement that depends on seeing a
-   refused attempt, on more than one currency, or on knowing who owns an account is not
-   satisfiable today — say so early rather than late.
-4. **Find the affected journey.** [customer-journeys.md](../bank-harness-kb/docs/customer-journeys.md)
-   shows what a user actually does today, and which journeys don't exist at all.
-5. **Write it down** in `requirements/`, using [the template](templates/requirement.md).
-6. **Capture what you learned.** New business facts → the KB. New open questions → the KB's
-   decisions document.
+The exact phases (loading, hypothesis, interview, coverage/feasibility check, drafting) are
+documented in [`refine-requirement`'s SKILL.md](.claude/skills/refine-requirement/SKILL.md) —
+not duplicated here, since that file is what actually runs the process.
 
 ## Writing a good requirement here
 
